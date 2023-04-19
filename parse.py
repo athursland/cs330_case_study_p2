@@ -2,7 +2,6 @@
 import data module
 with id, x, y coords
 """
-
 import csv
 
 def import_data(fname):
