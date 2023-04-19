@@ -14,15 +14,17 @@ import time
 ### define global variables
 fn = 'data/geolife-cars-upd8.csv'
 t_ids = 'data/trajectory-ids.txt'
-data = []
-ids = []
+global data
+global ids
 
 def import_ids(fname):
-    global ids
+    ids = []
     with open(fname, newline='', encoding='utf-8') as f:
         reader = csv.reader(f)
         for row in reader:
-            ids.append(row)
+            ids.append(row[0])
+
+    return ids
 
 def get_traj(data):
     trajectories = {}
@@ -45,9 +47,9 @@ def approach2(T):
         diff = M-n
         j = 0
         while j < diff:
-            x = (T[i][j][1] + T[i][j+1][1])/2
-            y = (T[i][j][2] + T[i][j+1][2])/2
-            T[i] = T[i][:j+1] + (T[i][j+1][0],  x, y) + T[i][j+1:]
+            x = (T[i][1][j][1] + T[i][1][j+1][1])/2
+            y = (T[i][1][j][2] + T[i][1][j+1][2])/2
+            T[i] = T[i][1][:j+1] + (T[i][1][j+1][0],  x, y) + T[i][1][j+1:]
             j += 1 
         i += 1
 
@@ -57,8 +59,8 @@ def approach2(T):
         all_x = []
         all_y = []
         for j in range(len(T)):
-            all_x.append(T[j][i][1])
-            all_y.append(T[j][i][2])
+            all_x.append(T[j][1][i][1])
+            all_y.append(T[j][1][i][2])
         T_c.append((sum(all_x)/len(T), sum(all_y)/len(T)))
         print(T_c)
 
@@ -66,6 +68,9 @@ def approach2(T):
 
 if __name__=="__main__":
     data = import_data(fn)
+    print(data[:5])
     ids = import_ids(t_ids)
+    print(ids)
     T = get_traj(ids)
-    print(approach2(T))
+    print(T)
+    print(approach2(T.items()))
