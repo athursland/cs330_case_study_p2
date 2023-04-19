@@ -29,11 +29,12 @@ def import_ids(fname):
 def get_traj(data):
     trajectories = {}
     for row in data:
-        if row[0] in ids:
-            if row[0] not in trajectories: 
-                row[0] = [row]
+        print(row)
+        if row in ids:
+            if row not in trajectories: 
+                trajectories[row] = [row]
             else:
-                row[0].append(row)
+                trajectories[row].append(row)
     return trajectories
 
 def approach2(T):
