@@ -10,6 +10,7 @@ import math
 import random
 import heapq
 import time
+import matplotlib
 
 ### define global variables
 fn = 'data/geolife-cars-upd8.csv'
