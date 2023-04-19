@@ -27,14 +27,16 @@ def import_ids(fname):
     return ids
 
 def get_traj(data):
+    """
+    returns a dict where k = t_id and v = datapoints for given trajectory
+    """
     trajectories = {}
     for row in data:
-        print(row)
-        if row in ids:
-            if row not in trajectories: 
-                trajectories[row] = [row]
+        if row[0] in ids:
+            if row[0] not in trajectories:
+                trajectories[row] = [(row[1], row[2])]
             else:
-                trajectories[row].append(row)
+                trajectories[row].append((row[1], row[2]))
     return trajectories
 
 def approach2(T):
@@ -48,8 +50,8 @@ def approach2(T):
         diff = M-n
         j = 0
         while j < diff:
-            x = (T[i][1][j][1] + T[i][1][j+1][1])/2
-            y = (T[i][1][j][2] + T[i][1][j+1][2])/2
+            x = (T[i][1][j][0] + T[i][1][j+1][0])/2
+            y = (T[i][1][j][1] + T[i][1][j+1][1])/2
             T[i] = T[i][1][:j+1] + (T[i][1][j+1][0],  x, y) + T[i][1][j+1:]
             j += 1 
         i += 1
@@ -60,18 +62,17 @@ def approach2(T):
         all_x = []
         all_y = []
         for j in range(len(T)):
-            all_x.append(T[j][1][i][1])
-            all_y.append(T[j][1][i][2])
+            all_x.append(T[j][i][0])
+            all_y.append(T[j][i][1])
         T_c.append((sum(all_x)/len(T), sum(all_y)/len(T)))
         print(T_c)
 
     return T_c
 
 if __name__=="__main__":
-    data = import_data(fn)
-    print(data[:5])
-    ids = import_ids(t_ids)
-    print(ids)
-    T = get_traj(ids)
-    print(T)
-    print(approach2(T.items()))
+    data = import_data(fn) # this is fine 
+    ids = import_ids(t_ids) # this is also fine
+    T = get_traj(data) ###### NOT FINE
+    #print(T.items())
+    print(list(T.values()))
+    print(approach2(list(T.values())))
