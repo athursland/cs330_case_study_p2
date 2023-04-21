@@ -122,40 +122,22 @@ def approach2(T):
     print("MAX # POINTS: ", M)
 
     for i in range(len(T)):
-        for i in range(2):
+        for _ in range(2):
             # i = index of trajectory in T
             t = traj_dict.get(T[i])
             n = len(t)
-            #print(n)
-            #n = len(T[i][1]) # number of points in t 
             diff = M-n-1
-            ### this won't run if M-n == 1 bc diff == 0 
-            #print(diff)
             j = 0
-            while j < min(diff, n-1): ### need to modify the dictionary
-                #print(j)
-                #x = (T[i][j][0] + T[i][j+1][0])/2 --- traj_dict.values()
-                #x = (T[i][1][j][0] + T[i][1][j+1][0])/2 --- traj_dict.items() input
-                #y = (T[i][j][1] + T[i][j+1][1])/2 --- traj_dict.values()
-                #y = (T[i][1][j][1] + T[i][1][j+1][1])/2 --- traj_dict.items() input
-                #T[i] = T[i][:j+1] + [(T[i][j+1][0],  x, y)] + T[i][j+1:]
-                #print(t[j])
+            while j < (min(diff, n-1))*2: 
                 x = (t[j][0] + t[j+1][0])/2
-                y = (t[j][0] + t[j+1][0])/2
-                #T[i] = T[i][1][:j+1] + [(T[i][1][j+1][0], x, y)] + T[i][1][j+1:]
-                traj_dict[T[i]] = t[:j+1] + [(x,y)] + t[j+1:]
-                #T[i] = t[:j+1] + [(x,y)] + t[j+1:]
-                #print(T[i])
-                j += 1
-        print(len(traj_dict.get(T[i])))
-        
-
-        ### this depends on the indexing of trajectory_ids
-        """
-        we need to update the dictionary, but we're only
-        passing the values in here, not the entire dictionary
-        make the dictionary global ? 
-        """
+                y = (t[j][1] + t[j+1][1])/2
+                t = t[:j+1] + [(x,y)] + t[j+1:]
+                j += 2
+            if len(t) == M-1: 
+                x = (t[-1][0] + t[-2][0])/2
+                y = (t[-1][1] + t[-2][1])/2
+                t = t[:-1] + [(x,y)] + t[-1:]
+            traj_dict[T[i]] = t 
     
     T_c = []
     for i in range(M): # unit of time 
@@ -163,28 +145,10 @@ def approach2(T):
         all_y = []
         for j in range(len(T)):
             all_x.append(traj_dict.get(T[j])[i][0])
-            all_y.append(traj_dict.get(T[j])[i][0])
+            all_y.append(traj_dict.get(T[j])[i][1])
         T_c.append((sum(all_x)/len(T), sum(all_y)/len(T)))
 
     return T_c
-
-    """
-    ### THIS WORKS ---
-    # i = unit of time
-    T_c = []
-    #print("M: ", M)
-    for i in range(M):
-        all_x = []
-        all_y = []
-        for j in range(len(T)):
-            all_x.append(T[j][1][i][0])
-            all_y.append(T[j][1][i][1])
-        #print('all_x: ', all_x)
-        #print("all_y", all_y)
-        T_c.append((sum(all_x)/len(T), sum(all_y)/len(T)))
-
-    return T_c
-    """
 
 #################
 ##### APPROACH 1
@@ -252,23 +216,24 @@ def visualize(T, T_c):
     T_x = []
     T_y = []
 
-    for t in T: # for each trajectory in t_ids
+    for k in T: # for each trajectory in t_ids
+        t = traj_dict.get(k)
         T_x.append([p[0] for p in t])
-        T_y .append([p[1] for p in t])
+        T_y.append([p[1] for p in t])
     
     T_c_x = [p[0] for p in T_c]
     T_c_y = [p[1] for p in T_c]
 
     for i in range(len(T)):
-        plt.plot(T_x[i], T_y[i], color = 'blue', linewidth = 0.7,
-        marker = '.', label = 'trajectory')
+        plt.plot(T_x[i], T_y[i], color = 'blue', linewidth = 0.7, label = 'trajectory')
     
-    plt.plot(T_c_x, T_c_y, color = 'red', linewidth = 0.7,
-        marker = '.', label = 'center trajectory')
+    plt.plot(T_c_x, T_c_y, color = 'red', linewidth = 0.5, label = 'center trajectory')
 
     plt.title('Approach 1 trajectories vs. trajectory center')
     plt.xlabel('x-coordinates')
     plt.ylabel('y-coordinates')
+
+    plt.show()
 
     return 
 
@@ -288,8 +253,8 @@ if __name__=="__main__":
     ### visualize results of approach 2
     traj_dict = get_traj(data)
     T_c = approach2(list(traj_dict.keys())) # pass keys, NOT values, then use get
-    #print(T_c)
-    #visualize(traj_dict, T_c)
+    print(T_c)
+    visualize(traj_dict.keys(), T_c)
 
     #print(T.get('115-20080527225031'))
     #print(approach2(list(T.values())))
