@@ -25,17 +25,15 @@ def import_ids(fname):
 
 # process trajectory data
 def get_traj(data):
-   """
-   returns a dict where k = t_id and v = datapoints for given trajectory
-   """
-   trajectories = {}
-   for row in data:
-      # if row[0] in ids:
-       if row[0] not in trajectories:
-           trajectories[row] = [(row[1], row[2])]
-       else:
-           trajectories[row].append((row[1], row[2]))
-   return trajectories
+    """
+    returns a dict where k = t_id and v = datapoints for given trajectory
+    """
+    trajectories = {}
+    for row in data:
+        if row[0] not in trajectories:
+            trajectories[row[0]] = []
+        trajectories[row[0]].append((row[1], row[2]))
+    return trajectories
 
 
 def k_means_clustering(T, k, seed):
@@ -107,6 +105,6 @@ if __name__ == '__main__':
    data = import_data(fn)  # this is fine
    #ids = import_ids(t_ids)  # this is also fine
    T = get_traj(data)  ###### NOT FINE
-   #print(T.values())
+   print(T.values())
    # print(T.items())
    #print(approach2(list(T.values())))
