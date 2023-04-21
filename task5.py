@@ -107,6 +107,6 @@ if __name__ == '__main__':
    data = import_data(fn)  # this is fine
    #ids = import_ids(t_ids)  # this is also fine
    T = get_traj(data)  ###### NOT FINE
-   #print(T.values())
+   print(T.values())
    # print(T.items())
    #print(approach2(list(T.values())))
