@@ -224,9 +224,14 @@ def visualize(T, T_c):
     T_c_x = [p[0] for p in T_c]
     T_c_y = [p[1] for p in T_c]
 
+    """
     for i in range(len(T)):
         plt.plot(T_x[i], T_y[i], color = 'blue', linewidth = 0.7, label = 'trajectory')
-    
+    """
+
+    plt.plot(T_x[0], T_y[0], color = 'blue', linewidth = 0.7, label = 't1')
+    plt.plot(T_x[1], T_y[1], color = 'orange', linewidth = 0.7, label = 't2')
+    plt.plot(T_x[2], T_y[2], color = 'green', linewidth = 0.7, label = 't3')
     plt.plot(T_c_x, T_c_y, color = 'red', linewidth = 0.5, label = 'center trajectory')
 
     plt.title('Approach 1 trajectories vs. trajectory center')
@@ -255,8 +260,4 @@ if __name__=="__main__":
     T_c = approach2(list(traj_dict.keys())) # pass keys, NOT values, then use get
     print(T_c)
     visualize(traj_dict.keys(), T_c)
-
-    #print(T.get('115-20080527225031'))
-    #print(approach2(list(T.values())))
-    #print(approach_1(list(T.values())))
     
