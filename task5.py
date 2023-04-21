@@ -7,6 +7,7 @@ Created on 4/20/23
 import random
 from task4 import dtw
 from parse import import_data
+import csv
 
 #vars
 fn = 'data/geolife-cars-upd8.csv'
@@ -25,17 +26,15 @@ def import_ids(fname):
 
 # process trajectory data
 def get_traj(data):
-   """
-   returns a dict where k = t_id and v = datapoints for given trajectory
-   """
-   trajectories = {}
-   for row in data:
-      # if row[0] in ids:
-       if row[0] not in trajectories:
-           trajectories[row] = [(row[1], row[2])]
-       else:
-           trajectories[row].append((row[1], row[2]))
-   return trajectories
+    """
+    returns a dict where k = t_id and v = datapoints for given trajectory
+    """
+    trajectories = {}
+    for row in data:
+        if row[0] not in trajectories:
+            trajectories[row[0]] = []
+        trajectories[row[0]].append((row[1], row[2]))
+    return trajectories
 
 
 def k_means_clustering(T, k, seed):
