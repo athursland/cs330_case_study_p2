@@ -10,13 +10,80 @@ import math
 import random
 import heapq
 import time
-import matplotlib
+from matplotlib import pyplot as plt
 
 ### define global variables
 fn = 'data/geolife-cars-upd8.csv'
 t_ids = 'data/trajectory-ids.txt'
 global data
 global ids
+
+############################
+##### SIMPLIFY TRAJECTORY 
+############################
+
+def dist(p1, p2):
+    x1, y1 = p1
+    x2, y2 = p2
+    return ((x2 - x1) ** 2 + (y2 - y1) ** 2) ** 0.5
+
+def dotProduct(A,B):
+    return A[0]*B[0]+A[1]*B[1]
+
+def dist_point_segment(q, e): #d in the case study doc
+    # Compute the squared length of the segment e
+    a = e[0]
+    b = e[1]
+    l2 = (b[0] - a[0]) ** 2 + (b[1] - a[1]) ** 2
+    #return distance to closest of the endpoints
+    if l2 == 0:
+        return min(dist(q, a), dist(q,b))
+
+    AB = [e[1][0]-e[0][0],e[1][1]-e[0][1]]
+    AQ = [q[0]-e[0][0],q[1]-e[0][1]]
+    BQ = [q[0]-e[1][0],q[1]-e[1][1]]
+    if dotProduct(AB,AQ)==0 or dotProduct(AB,BQ)==0:
+        return (abs(((b[0] - a[0])* (a[1]-q[1])) - ((a[0] - q[0]) * (b[1]-a[1])))/ math.sqrt(l2))
+    else:
+        return min(dist((e[0][0],e[0][1]),q),dist((e[1][0],e[1][1]),q))
+
+#function that returns the 2 points closest to p from list of points
+def closest_points(p, points):
+    closest, second_closest = None, None
+    min_dist, sec_min_dist = math.inf, math.inf
+    for point in points:
+        if dist(p, point) < min_dist:
+            second_closest = closest
+            sec_min_dist = min_dist
+            closest = point
+            min_dist = dist(p, point)
+        elif dist(p, point) < sec_min_dist:
+            second_closest = point
+            sec_min_dist = dist(p, point)
+
+    return closest, second_closest
+
+def simplify_trajectory(T, eps):
+    if len(T) < 3:
+       # Base case: return the input trajectory if it has 2 or fewer points
+       return []
+
+    T_start=T[0]
+    T_end=T[-1]
+
+    max_dist, max_idx = max((dist_point_segment(T[i], (T_start, T_end)), i) for i in range(1, len(T) - 1))
+    
+    if max_dist>eps:
+       simplified_left= simplify_trajectory(T[:max_idx+1],eps)
+       simplified_right= simplify_trajectory(T[max_idx:],eps)
+       return simplified_left[:-1] + simplified_right
+       #simplify_trajectory(T[maxDpoint:],eps)
+    else:
+       return [T[0],T[-1]]
+
+#################
+##### APPROACH 2
+#################
 
 # import trajectory ids
 def import_ids(fname):
@@ -43,25 +110,66 @@ def get_traj(data):
     return trajectories
 
 def approach2(T):
+    """
+    input: keys from the dictionary
+    """
     M = 0
     for t in T:
-        if len(t) > M:
-            M = len(t)
+        t_n = len(traj_dict.get(t))
+        if t_n > M:
+            M = t_n
+    
+    print("MAX # POINTS: ", M)
 
     for i in range(len(T)):
-        # i = index of trajectory in T
-        n = len(T[i]) # number of points in t 
-        diff = M-n
-        j = 0
-        while j < diff:
-            x = (T[i][j][0] + T[i][j+1][0])/2
-            #x = (T[i][1][j][0] + T[i][1][j+1][0])/2
-            y = (T[i][j][1] + T[i][j+1][1])/2
-            #y = (T[i][1][j][1] + T[i][1][j+1][1])/2
-            T[i] = T[i][:j+1] + [(T[i][j+1][0],  x, y)] + T[i][j+1:]
-            j += 1 
-        i += 1
+        for i in range(2):
+            # i = index of trajectory in T
+            t = traj_dict.get(T[i])
+            n = len(t)
+            #print(n)
+            #n = len(T[i][1]) # number of points in t 
+            diff = M-n-1
+            ### this won't run if M-n == 1 bc diff == 0 
+            #print(diff)
+            j = 0
+            while j < min(diff, n-1): ### need to modify the dictionary
+                #print(j)
+                #x = (T[i][j][0] + T[i][j+1][0])/2 --- traj_dict.values()
+                #x = (T[i][1][j][0] + T[i][1][j+1][0])/2 --- traj_dict.items() input
+                #y = (T[i][j][1] + T[i][j+1][1])/2 --- traj_dict.values()
+                #y = (T[i][1][j][1] + T[i][1][j+1][1])/2 --- traj_dict.items() input
+                #T[i] = T[i][:j+1] + [(T[i][j+1][0],  x, y)] + T[i][j+1:]
+                #print(t[j])
+                x = (t[j][0] + t[j+1][0])/2
+                y = (t[j][0] + t[j+1][0])/2
+                #T[i] = T[i][1][:j+1] + [(T[i][1][j+1][0], x, y)] + T[i][1][j+1:]
+                traj_dict[T[i]] = t[:j+1] + [(x,y)] + t[j+1:]
+                #T[i] = t[:j+1] + [(x,y)] + t[j+1:]
+                #print(T[i])
+                j += 1
+        print(len(traj_dict.get(T[i])))
+        
 
+        ### this depends on the indexing of trajectory_ids
+        """
+        we need to update the dictionary, but we're only
+        passing the values in here, not the entire dictionary
+        make the dictionary global ? 
+        """
+    
+    T_c = []
+    for i in range(M): # unit of time 
+        all_x = []
+        all_y = []
+        for j in range(len(T)):
+            all_x.append(traj_dict.get(T[j])[i][0])
+            all_y.append(traj_dict.get(T[j])[i][0])
+        T_c.append((sum(all_x)/len(T), sum(all_y)/len(T)))
+
+    return T_c
+
+    """
+    ### THIS WORKS ---
     # i = unit of time
     T_c = []
     #print("M: ", M)
@@ -69,14 +177,18 @@ def approach2(T):
         all_x = []
         all_y = []
         for j in range(len(T)):
-            all_x.append(T[j][i][0])
-            all_y.append(T[j][i][1])
+            all_x.append(T[j][1][i][0])
+            all_y.append(T[j][1][i][1])
         #print('all_x: ', all_x)
         #print("all_y", all_y)
         T_c.append((sum(all_x)/len(T), sum(all_y)/len(T)))
-        print(len(T_c))
 
     return T_c
+    """
+
+#################
+##### APPROACH 1
+#################
 
 def approach_1(trajectories): #want trajectories as a dictionary with id as
    # key and list of tuples as value
@@ -128,16 +240,58 @@ def dtw(seriesA, seriesB):
 
    return DP[n - 1][m - 1]
 
-
 #Distance Formula
 def dist(a, b):
   return math.dist([a[0], a[1]], [b[0], b[1]])
 
+#########################
+##### TASK 3.2: VISUALIZE
+#########################
+
+def visualize(T, T_c):
+    T_x = []
+    T_y = []
+
+    for t in T: # for each trajectory in t_ids
+        T_x.append([p[0] for p in t])
+        T_y .append([p[1] for p in t])
+    
+    T_c_x = [p[0] for p in T_c]
+    T_c_y = [p[1] for p in T_c]
+
+    for i in range(len(T)):
+        plt.plot(T_x[i], T_y[i], color = 'blue', linewidth = 0.7,
+        marker = '.', label = 'trajectory')
+    
+    plt.plot(T_c_x, T_c_y, color = 'red', linewidth = 0.7,
+        marker = '.', label = 'center trajectory')
+
+    plt.title('Approach 1 trajectories vs. trajectory center')
+    plt.xlabel('x-coordinates')
+    plt.ylabel('y-coordinates')
+
+    return 
+
+
+#################
+##### MAIN
+#################
+
 if __name__=="__main__":
+    ### import data
+    global traj_dict
     data = import_data(fn) # this is fine 
     ids = import_ids(t_ids) # this is also fine
-    T = get_traj(data)
+    
+#   ## visualize results of approach 1
+
+    ### visualize results of approach 2
+    traj_dict = get_traj(data)
+    T_c = approach2(list(traj_dict.keys())) # pass keys, NOT values, then use get
+    #print(T_c)
+    #visualize(traj_dict, T_c)
+
     #print(T.get('115-20080527225031'))
     #print(approach2(list(T.values())))
-    print(approach_1(list(T.values())))
+    #print(approach_1(list(T.values())))
     
