@@ -5,8 +5,6 @@ mike kim
 noa nir 
 """
 
-import task4
-
 ############################
 ##### SIMPLIFY TRAJECTORY 
 ############################

@@ -1,0 +1,11 @@
+avg dist to trajectory 0: 0.11209253711526782
+avg dist to trajectory 1: 0.0
+avg dist to trajectory 2: 0.0999261617128033
+avg dist to trajectory 3: 0.09911816504474828
+avg dist to trajectory 4: 0.05240560889166035
+avg dist to trajectory 5: 0.0555922243416515
+avg dist to trajectory 6: 0.04874050595174525
+avg dist to trajectory 7: 0.10148289577188419
+avg dist to trajectory 8: 0.08777213667813938
+avg dist to trajectory 9: 0.04574330131848599
+avg dist to trajectory 10: 0.03807497768093146

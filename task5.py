@@ -6,7 +6,7 @@ Created on 4/20/23
 
 import random
 from task4 import dtw
-from parse import import_data
+from import_data import import_data
 import csv
 
 #vars

@@ -54,7 +54,7 @@ def approach2(T):
     return T_c
 
 #########################
-##### TASK 3.2: VISUALIZE
+##### EXPERIMENTS
 #########################
 
 def get_avg_dist(T, T_c):
@@ -74,8 +74,8 @@ def get_avg_dist(T, T_c):
             d_sum += closest_d
         avg_dists.append(d_sum/n)
 
-    L = ["avg dist to trajectory {}: {}".format(i, avg_dists[i]) for i in range(len(T))]
-    with open('approach1_avg_dists.txt', 'w') as file1:
+    L = ["avg dist to trajectory {}: {}\n".format(i, avg_dists[i]) for i in range(len(T))]
+    with open('approach2_avg_dists.txt', 'w') as file1:
         file1.writelines(L)
     return avg_dists
 
@@ -115,7 +115,8 @@ if __name__=="__main__":
     traj_dict = import_data.get_traj(data) # this contains ALL of the trajectories
     ids_from_txt = {key: traj_dict[key] for key in traj_dict if key in ids} # dictionary list comprehension to filter for just the ones from the txt file
     T_c = approach2(list(ids_from_txt.keys()))
-    print(T_c)
-    #visualize(ids_from_txt.keys(), T_c)
-    print(get_avg_dist(list(ids_from_txt.keys()), T_c))
+    #print(T_c)
+    visualize(ids_from_txt.keys(), T_c)
+    #print(get_avg_dist(list(ids_from_txt.keys()), T_c))
+    #print(visualize(T, T_c))
     
