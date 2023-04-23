@@ -111,8 +111,12 @@ if __name__=="__main__":
     traj_dict = import_data.get_traj(data) # this contains ALL of the trajectories
     ids_from_txt = {key: traj_dict[key] for key in traj_dict if key in ids} # dictionary list comprehension to filter for just the ones from the txt file
     T_c = approach2(list(ids_from_txt.keys()))
-    #print(T_c)
+
+    ### simplify results 0.3
+    eps = [0.03, 0.1, 0.3]
+    for i in range(3):
+        ids_from_txt = {key: simplify.simplify_trajectory(traj_dict[key], eps[i]) for key in traj_dict if key in ids} # dictionary list comprehension to filter for just the ones from the txt file
+        T_c = approach1(list(ids_from_txt.values()))
+
     visualize(ids_from_txt.keys(), T_c)
-    #print(get_avg_dist(list(ids_from_txt.keys()), T_c))
-    #print(visualize(T, T_c))
     

@@ -100,7 +100,7 @@ def visualize(T, T_c):
 
     return 
 
-def get_avg_dist(T, T_c, i):
+def get_avg_dist(T, T_c):
     avg_dists = []
     M = len(T_c)
     
@@ -118,18 +118,51 @@ def get_avg_dist(T, T_c, i):
         avg_dists.append(d_sum/n)
 
     L = ["avg dist to trajectory {}: {}\n".format(i, avg_dists[i]) for i in range(len(T))]
-    with open('approach1_avg_dists_eps_{}.txt'.format(i), 'w') as file1:
+    with open('approach1_avg_dists.txt'.format(i), 'w') as file1:
         file1.writelines(L)
     return avg_dists
+
+def visualize(T, T_c):
+    T_x = []
+    T_y = []
+
+    for k in T: # for each trajectory in t_ids
+        t = traj_dict.get(k)
+        T_x.append([p[0] for p in t])
+        T_y.append([p[1] for p in t])
+    
+    T_c_x = [p[0] for p in T_c]
+    T_c_y = [p[1] for p in T_c]
+
+    colors = ['b', 'g', 'y', 'c', 'm', 'purple', 'olive', 'brown', 'pink', 'gray', 'black']
+    for i in range(len(T)):
+        plt.plot(T_x[i], T_y[i], color = colors[i], linewidth = 0.7, alpha = 0.8, label = 't_{}'.format(i))
+
+    plt.plot(T_c_x, T_c_y, color = 'r', linewidth = 0.8, label = 'approach 1 T_c')
+    plt.title('Input trajectories and T_c')
+    plt.xlabel('x-coord')
+    plt.ylabel('y-coord')
+    plt.legend()
+
+    plt.show()
+
+    return 
 
 if __name__=="__main__":
     data = import_data.import_data(fn)
     ids = import_data.import_ids(t_ids) 
     traj_dict = import_data.get_traj(data) # this contains ALL of the trajectories
+    ids_from_txt = {key: traj_dict[key] for key in traj_dict if key in ids}
+    T_c = approach1(list(ids_from_txt.values()))
+
+    get_avg_dist(ids_from_txt.keys(), T_c)
+    #visualize(ids_from_txt, T_c)
     
     ### simplify results 0.03 0.1 0.3 
+    """
     eps = [0.03, 0.1, 0.3]
     for i in range(3):
         ids_from_txt = {key: simplify.simplify_trajectory(traj_dict[key], eps[i]) for key in traj_dict if key in ids} # dictionary list comprehension to filter for just the ones from the txt file
         T_c = approach1(list(ids_from_txt.values()))
         get_avg_dist(ids_from_txt.keys(), T_c, i)
+    """
