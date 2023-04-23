@@ -284,16 +284,14 @@ if __name__ == '__main__':
    ### experiments - evaluate different ks 
    evaluate_different_k(list(T.keys()))
 
-   # plot the centers for our proposed k and proposed seeding
-   random_centers, random_costs = k_means_clustering(list(T.keys()), k, 'random')
-   prop_centers, prop_costs = k_means_clustering(list(T.keys()), k, 'proposed')
-   plot_centers(T, prop_centers)
+   ######## plot the centers for our proposed k and proposed seeding
+   #random_centers, random_costs = k_means_clustering(list(T.keys()), k, 'random')
+   #prop_centers, prop_costs = k_means_clustering(list(T.keys()), k, 'proposed')
+   #plot_centers(T, prop_centers)
 
-   # evaluate averages
-   random_avgs = average_costs(random_costs, len(random_costs))
-   prop_avgs = average_costs(prop_costs, len(prop_costs))
-   visualize_avg_costs(random, prop_avgs)
+   ######## evaluate averages
+   # random_avgs = average_costs(random_costs, len(random_costs))
+   # prop_avgs = average_costs(prop_costs, len(prop_costs))
+   # visualize_avg_costs(random, prop_avgs)
 
-   #ids_from_txt = {key: simplify.simplify_trajectory(T[key], 0.3) for key in T if key in ids}
-   # dictionary list comprehension to filter for just the ones from the txt file
    
