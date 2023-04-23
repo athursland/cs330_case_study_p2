@@ -94,33 +94,30 @@ def k_means_clustering(T, k, seed):
    if seed == "proposed":
        centers = prop_seed(T, k)
 
-   for numIteration in range(tmax):  # for every iteration of Loyd's algorithm
-       print(numIteration)
+   for n in range(tmax):  # for every iteration of Loyd's algorithm
+       print(n)
        temp = [] #stores the list of costs -- a list of the distance from each trajectory to its center
-       # list of k clusters
        clusters = [[] for _ in range(k)]  # each [] inside represent a cluster
-       for t in T.keys():  # for every trajectory
+       for t in T.keys():  #for every trajectory
            print(t)
            traj_pts = T.get(t)
            distance = float('inf')
            clusterNum = k
-           for ct in centers:
+           for ct in centers: #centers and clusters are parallel lists
                ct_pts = T.get(ct)
-               if dtw(traj_pts,
-                      ct_pts) < distance:  # calculate the distance between trajectory and a center trajectory
-                   distance = dtw(traj_pts, ct_pts)  # update distance with minimum distance
-                   clusterNum = centers.index(
-                       ct)  # clusterNum is the index of which that center trajectory appears in "centers"
+               if dtw(traj_pts, ct_pts) < distance:  # calculate the distance between trajectory and a center trajectory
+                   distance = dtw(traj_pts, ct_pts)  
+                   clusterNum = centers.index(ct)  # clusterNum is the index of which that center trajectory appears in "centers"
            temp.append(distance)
            print(distance)
-           clusters[clusterNum].append(t)
-           print(clusters)# put that trajectory into the appropriate cluster
-           # so for example clusters[2] has all trajectories in T that is closest to the center trajectory indexed at 2 in "centers"
+           clusters[clusterNum].append(t) #put that trajectory into the appropriate cluster
+           print(clusters)
        print(costs)
        costs.append(temp)
+
        thresh = 2  # initialize thresh variable TODO fill in
        new_centers = []
-       for i in range(len(clusters)):  # for every cluster (here len(clusters)=k)
+       for i in range(len(clusters)): 
            distance = float('inf')
            newCenterTrajectory = approach1(clusters[i])
            '''
@@ -139,17 +136,18 @@ def k_means_clustering(T, k, seed):
                if distance2 < distance:
                    newCenterTrajectory = c #here it becomes an id
                    distance = distance2  # we need to update the newCenterTrajectory with an existing trajectory in clusters that's closest to the one calculated using approach 2
-               i += 1'''
+               i += 1
+            '''
            new_centers.append(newCenterTrajectory)
            print(new_centers)
        # if for all the distance between the new center trajectory and the previous center trajectory is below a threshold
        # break and return the clusters, else continue regrouping the clusters
-       if all(dtw(T.get(new_centers[i]), T.get(centers[i])) < thresh for i in
-              range(k)):  # here we assume the index ordering was maintained
+       if all(dtw(T.get(new_centers[i]), T.get(centers[i])) < thresh for i in range(k)):  
            break
        centers = new_centers
+   
    return [T.get(c) for c in centers], costs
-       # TO DO: define threshold, define tmax
+       
 
 
 def approach2(T):
@@ -182,7 +180,7 @@ def approach2(T):
 
    return T_c
 
-def approach1(trajectories): #want trajectories as a list of trajectories so T.values()
+def approach1(trajectories): #trajectories is a list of t-ids
   min_dist = float('inf')
   center = None
   for t_i in trajectories:
