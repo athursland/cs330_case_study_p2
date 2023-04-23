@@ -38,6 +38,41 @@ def get_traj(data):
         trajectories[row[0]].append((row[1], row[2]))
     return trajectories
 
+def split_into_k_groups(lst, k):
+   n = len(lst)
+   group_size = n // k
+   groups = []
+   for i in range(k):
+       group = []
+       while len(group) < group_size:
+           idx = random.randint(0, n-1)
+           if lst[idx -1] not in group:
+               group.append(lst[idx])
+       groups.append(group)
+       lst = [x for x in lst if x not in group]
+       n -= len(group)
+   #print([x[:10] for x in groups])
+   return groups
+
+def prop_seed(all, k):
+   centers = []
+   groups = split_into_k_groups(list(all.keys()), k) #returns list of length k, with ids
+   #print(groups)
+   for group in groups:
+       print('Hi')
+       avg = task4.approach2(group)
+       center = []
+       min_dist = float('inf')
+       for traj in group:
+           print("in this loop")
+           dist = dtw(all.get(traj), avg)
+           if dist < min_dist:
+               min_dist = dist
+               center = traj
+       centers.append(center)
+   return centers
+
+
 def k_means_clustering(T, k, seed):
     '''
     T: dictionary of trajectories where k=t_id and v=LIST of points that make up the trajectory
@@ -48,8 +83,8 @@ def k_means_clustering(T, k, seed):
     if seed=="random":
         centers = random.sample(list(T.keys()),k)
     if seed=="proposed":
-        #TO DO: choose the centers in a more meaningful way
-        pass
+        centers = prop_seed(T, k)
+        
 
     for numIteration in range(tmax): #for every iteration of Loyd's algorithm
         #list of k clusters 
