@@ -66,7 +66,7 @@ def prop_seed(all, k):
    # print(groups)
    for group in groups:
        print('Hi')
-       avg = task4.approach2(group)
+       avg = approach2(group)
        center = []
        min_dist = float('inf')
        for traj in group:
