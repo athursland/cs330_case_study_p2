@@ -4,7 +4,6 @@ Created on 4/20/23
 @author: noanir
 """
 
-import task4
 import random
 from approach1 import dtw
 import import_data
@@ -176,8 +175,40 @@ def visualize_avg_costs(random_avgs, prop_avgs):
     plt.ylabel('average cost of clustering')
     plt.legend()
 
-    plt.show()
+    plt.savefig('avg_costs_over_iterations.png')
     return
+
+def plot_centers(T, centers):
+    """
+    input: dictionary of traj, list of keys of center trajectories 
+    computed from proposed seeding w/ proposed k
+    output: save plot of all center clusters
+    w/ different colors distinguishing them 
+    """
+    get_colors = lambda n: ["#%06x" % random.randint(0, 0xFFFFFF) for _ in range(n)]
+    colors = get_colors(len(centers))
+    
+    all_x_by_c = []
+    all_y_by_c = []
+
+    for c_id in centers:
+        c = T.get(c_id)
+        c_x = [p[0] for p in c]
+        c_y = [p[1] for p in c]
+        all_x_by_c.append(c_x)
+        all_y_by_c.append(c_y)
+
+    for i in range(len(centers)):
+        plt.plot(all_x_by_c[i], all_y_by_c[i], color = colors[i], linewidth = 0.7, label = 'cluster {}'.format(i))
+
+    plt.title('Center trajectories computed from proposed seeding with proposed k')
+    plt.xlabel('x-coordinates')
+    plt.ylabel('y-coordinates')
+    plt.legend()
+
+    plt.show()
+        
+    return 
 
 def evaluate_different_k(keys):
     """
