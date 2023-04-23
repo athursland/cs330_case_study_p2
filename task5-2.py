@@ -10,6 +10,7 @@ from approach1 import dtw
 import import_data
 import csv
 import simplify
+from matplotlib import pyplot  as plt
 
 
 # vars
@@ -161,6 +162,23 @@ def average_costs(costs, n):
             run_sum += costs[i][j]
         avgs.append(run_sum/len(costs))
     return avgs
+
+def visualize_avg_costs(random_avgs, prop_avgs):
+    """
+    using average_costs function, plot the avg cost of clustering 
+    over iterations for both seeding methods using suggested value of k
+    """
+    iter = [j for j in range(1, len(random_avgs))] # arbitrary
+    plt.plot(iter, random_avgs, color = 'r', linewidth = 0.8, marker = '.', label = 'random seeding method')
+    plt.plot(iter, prop_avgs, color = 'r', linewidth = 0.8, marker = '.', label = 'proposed seeding method')
+    plt.title('Avg cost of clustering over iterations for random vs. proposed seeding methods')
+    plt.xlabel('iteration')
+    plt.ylabel('average cost of clustering')
+    plt.legend()
+
+    plt.show()
+    return
+
 
 def approach1(trajectories): #trajectories is a list of t-ids
   min_dist = float('inf')
