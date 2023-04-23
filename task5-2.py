@@ -170,7 +170,7 @@ def visualize_avg_costs(random_avgs, prop_avgs):
     """
     iter = [j for j in range(1, len(random_avgs))] # arbitrary
     plt.plot(iter, random_avgs, color = 'r', linewidth = 0.8, marker = '.', label = 'random seeding method')
-    plt.plot(iter, prop_avgs, color = 'r', linewidth = 0.8, marker = '.', label = 'proposed seeding method')
+    plt.plot(iter, prop_avgs, color = 'b', linewidth = 0.8, marker = '.', label = 'proposed seeding method')
     plt.title('Avg cost of clustering over iterations for random vs. proposed seeding methods')
     plt.xlabel('iteration')
     plt.ylabel('average cost of clustering')
@@ -179,6 +179,45 @@ def visualize_avg_costs(random_avgs, prop_avgs):
     plt.show()
     return
 
+def evaluate_different_k(keys):
+    """
+    input: list of keys fro dictionary, seed 
+    output: line plots of avg cost of clustering 
+    for k = [4,6,8,10,12] for given seed
+    after testing 3 times for robustness 
+    """
+    k_vals = [4,6,8,10,12]
+    avg_costs_r = []
+    avg_costs_prop = []
+
+    # get avg costs for each value of k for random seeding
+    for i in range(len(k_vals)):
+        k_costs = []
+        for j in range(3):
+            _, costs = k_means_clustering(keys, k_vals[i], 'random')
+            k_costs.append(costs)
+        avg_costs_r.append(sum(k_costs)/3)
+
+    # save results to a txt file for random seeding
+    L = ["avg cost for k = {}: {}\n".format(k[i], avg_costs_r[i]) for i in range(len(k_vals))]
+    with open('avg_costs_seed_random.txt', 'w') as file1:
+        file1.writelines(L)
+
+    # save results to a txt file for prop seeding
+    L = ["avg cost for k = {}: {}\n".format(k[i], avg_costs_prop[i]) for i in range(len(k_vals))]
+    with open('avg_costs_seed_prop.txt', 'w') as file2:
+        file2.writelines(L)
+
+    # visualize results
+    plt.plot(k_vals, avg_costs_r, color = 'r', linewidth = 1, marker = '.', label = 'avg costs of clustering, random seeding')
+    plt.plot(k_vals, avg_costs_prop, color = 'b', linewidth = 1, marker = '.', label = 'avg costs of clustering, proposed seeding')
+    plt.title('Avg cost of clustering vs. k for both seeding methods')
+    plt.xlabel('k-value')
+    plt.ylabel('avg cost of clustering')
+    plt.legend()
+    plt.savefig('avg_costs_vs_k.png')
+    
+    return
 
 def approach1(trajectories): #trajectories is a list of t-ids
   min_dist = float('inf')
