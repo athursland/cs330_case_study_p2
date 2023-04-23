@@ -229,6 +229,15 @@ def evaluate_different_k(keys):
             k_costs.append(costs)
         avg_costs_r.append(sum(k_costs)/3)
 
+    # get avg costs for each value of k for prop seeding
+    for i in range(len(k_vals)):
+        k_costs = []
+        for j in range(3):
+            _, costs = k_means_clustering(keys, k_vals[i], 'prop')
+            k_costs.append(costs)
+        avg_costs_r.append(sum(k_costs)/3)
+
+
     # save results to a txt file for random seeding
     L = ["avg cost for k = {}: {}\n".format(k[i], avg_costs_r[i]) for i in range(len(k_vals))]
     with open('avg_costs_seed_random.txt', 'w') as file1:
@@ -266,16 +275,25 @@ def approach1(trajectories): #trajectories is a list of t-ids
 if __name__ == '__main__':
    data = import_data.import_data(fn)
    ids = import_data.import_ids(t_ids)
-   T = get_traj(data)
+   T_complex = get_traj(data)
+   T = {key: simplify.simplify_trajectory(T_complex[key], 0.3) for key in T_complex} # simplified trajectories with eps = 0.3
    n = len(list(T.keys()))
-   k = 5
+   k = 5 # TODO: update
    #seed = 'random'
 
-   ### simplify results 0.03 0.1 0.3
-   ids_from_txt = {key: simplify.simplify_trajectory(T[key], 0.3) for key in T if
-                   key in ids}
+   ### experiments - evaluate different ks 
+   evaluate_different_k(list(T.keys()))
+
+   # plot the centers for our proposed k and proposed seeding
+   random_centers, random_costs = k_means_clustering(list(T.keys()), k, 'random')
+   prop_centers, prop_costs = k_means_clustering(list(T.keys()), k, 'proposed')
+   plot_centers(T, prop_centers)
+
+   # evaluate averages
+   random_avgs = average_costs(random_costs, len(random_costs))
+   prop_avgs = average_costs(prop_costs, len(prop_costs))
+   visualize_avg_costs(random, prop_avgs)
+
+   #ids_from_txt = {key: simplify.simplify_trajectory(T[key], 0.3) for key in T if key in ids}
    # dictionary list comprehension to filter for just the ones from the txt file
-   crandom_centers, random_costs = k_means_clustering(ids_from_txt, k, 'random')
-   prop_centers, prop_costs = k_means_clustering(ids_from_txt, k, 'proposed')
-
-
+   
