@@ -7,11 +7,7 @@ noa nir
 import import_data
 import approach1
 import simplify
-import csv
-import math
-import heapq
 from matplotlib import pyplot as plt
-from matplotlib import cm
 
 ### define global variables
 fn = 'data/geolife-cars-upd8.csv'
