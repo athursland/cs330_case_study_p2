@@ -210,7 +210,7 @@ def plot_centers(T, centers):
         
     return 
 
-def evaluate_different_k(keys):
+def evaluate_different_k(T):
     """
     input: list of keys fro dictionary, seed 
     output: line plots of avg cost of clustering 
@@ -225,7 +225,7 @@ def evaluate_different_k(keys):
     for i in range(len(k_vals)):
         k_costs = []
         for j in range(3):
-            _, costs = k_means_clustering(keys, k_vals[i], 'random')
+            _, costs = k_means_clustering(T, k_vals[i], 'random')
             k_costs.append(costs)
         avg_costs_r.append(sum(k_costs)/3)
 
@@ -233,7 +233,7 @@ def evaluate_different_k(keys):
     for i in range(len(k_vals)):
         k_costs = []
         for j in range(3):
-            _, costs = k_means_clustering(keys, k_vals[i], 'prop')
+            _, costs = k_means_clustering(T, k_vals[i], 'prop')
             k_costs.append(costs)
         avg_costs_r.append(sum(k_costs)/3)
 
@@ -282,7 +282,7 @@ if __name__ == '__main__':
    #seed = 'random'
 
    ### experiments - evaluate different ks 
-   evaluate_different_k(list(T.keys()))
+   evaluate_different_k(T)
 
    ######## plot the centers for our proposed k and proposed seeding
    #random_centers, random_costs = k_means_clustering(list(T.keys()), k, 'random')
