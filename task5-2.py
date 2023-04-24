@@ -83,7 +83,7 @@ def k_means_clustering(T, k, seed):
        centers = prop_seed(T, k)
 
    for n in range(tmax):
-       print('run #: {}'.format(n))  # for every iteration of Lloyd's algorithm
+       print('k-means run #: {}'.format(n))  # for every iteration of Lloyd's algorithm
        temp = [] #stores the list of costs -- a list of the distance from each trajectory to its center
        clusters = [[] for _ in range(k)]  # each [] inside represent a cluster
        for t in T.keys():  #for every trajectory
@@ -135,8 +135,8 @@ def approach2(T):
        if t_n > M:
            M = t_n
        t_lengths.append(t_n)
-       print('t_lengths: ', t_lengths) 
-   print('M: ', M)
+       #print('t_lengths: ', t_lengths) 
+   #print('M: ', M)
 
    T_c = []
    for i in range(M):  # unit of time
@@ -234,20 +234,29 @@ def evaluate_different_k(T):
         print('k-val, random seed: {}'.format(k_vals[i]))
         k_costs = []
         for j in range(3):
-            print('run {}...'.format(j))
+            print('evaluate func run {}...'.format(j))
             _, costs = k_means_clustering(T, k_vals[i], 'random')
-            k_costs.append(costs)
-        avg_costs_r.append(sum(k_costs)/3)
+            j_cost = []
+            for k in costs:
+                j_cost.append(sum(k)/len(k)) ### avg for this iteration
+                print(sum(k)/len(k))
+            k_costs.append(sum(j_cost)/len(j_cost)) 
+            print(sum(j_cost)/len(j_cost)) ### avg for this entire run 
+        print(sum(k_costs)/3) 
+        avg_costs_r.append(sum(k_costs)/3) ## avg over 3 runs 
 
     # get avg costs for each value of k for prop seeding
     for i in range(len(k_vals)):
         print('k-val, prop seed: {}'.format(k_vals[i]))
         k_costs = []
         for j in range(3):
-            print('run {}...'.format(j))
+            print('evaluate func run {}...'.format(j))
             _, costs = k_means_clustering(T, k_vals[i], 'prop')
-            k_costs.append(costs)
-        avg_costs_r.append(sum(k_costs)/3)
+            j_cost = []
+            for k in costs:
+                j_cost.append(sum(k)/len(k)) ### avg for this iteration
+            k_costs.append(sum(j_cost)/len(j_cost)) ### avg for this entire run 
+        avg_costs_prop.append(sum(k_costs)/3) ## avg over 3 runs, append to final list, idx == value of k 
 
 
     # save results to a txt file for random seeding
