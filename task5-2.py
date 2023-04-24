@@ -10,15 +10,12 @@ import import_data
 import csv
 import simplify
 from matplotlib import pyplot  as plt
-
+import cProfile
 
 # vars
 fn = 'data/geolife-cars-upd8.csv'
 t_ids = 'data/trajectory-ids.txt'
-global data
-global ids
 global ids_from_txt
-
 
 def import_ids(fname):
    ids = []
@@ -26,9 +23,9 @@ def import_ids(fname):
        reader = csv.reader(f)
        for row in reader:
            ids.append(row[0])
-
    return ids
 
+ids_from_txt = import_ids(fn)
 
 # process trajectory data
 def get_traj(data):
@@ -50,11 +47,10 @@ def split_into_k_groups(lst, k):
        group = []
        while len(group) < group_size:
            idx = random.randint(0, n - 1)
-           if lst[idx - 1] not in group:
-               group.append(lst[idx])
+           n -= 1
+           group.append(lst[idx])
+           lst.remove(idx)
        groups.append(group)
-       lst = [x for x in lst if x not in group]
-       n -= len(group)
    return groups
 
 def prop_seed(all, k):
@@ -86,7 +82,8 @@ def k_means_clustering(T, k, seed):
    if seed == "proposed":
        centers = prop_seed(T, k)
 
-   for n in range(tmax):  # for every iteration of Lloyd's algorithm
+   for n in range(tmax):
+       print('run #: {}'.format(n))  # for every iteration of Lloyd's algorithm
        temp = [] #stores the list of costs -- a list of the distance from each trajectory to its center
        clusters = [[] for _ in range(k)]  # each [] inside represent a cluster
        for t in T.keys():  #for every trajectory
@@ -100,15 +97,26 @@ def k_means_clustering(T, k, seed):
                    clusterNum = centers.index(ct)  # clusterNum is the index of which that center trajectory appears in "centers"
            temp.append(distance)
            clusters[clusterNum].append(t)
-       print(costs)
+       #print(costs)
        costs.append(temp)
 
        thresh = 2  # initialize thresh variable TODO fill in
        new_centers = []
        for i in range(len(clusters)): 
            distance = float('inf')
-           newCenterTrajectory = approach1(clusters[i])
-           new_centers.append(newCenterTrajectory)
+           T_clust = {key: T[key] for key in T if key in clusters[i]}
+           avg_t = approach2(T_clust)
+           
+           center = avg_t 
+           min_dist = float('inf')
+           for t_j in T_clust.items():
+                if center is not t_j:
+                    dist = dtw(avg_t, t_j[1])
+                    if dist < min_dist:
+                        min_dist = dist
+                        center = t_j[0] # id 
+
+           new_centers.append(center)
        # if for all the distance between the new center trajectory and the previous center trajectory is below a threshold
        # break and return the clusters, else continue regrouping the clusters
        if all(dtw(T.get(new_centers[i]), T.get(centers[i])) < thresh for i in range(k)):  
@@ -118,27 +126,29 @@ def k_means_clustering(T, k, seed):
    return [T.get(c) for c in centers], costs
 
 def approach2(T):
-   """
-   input: keys from the dictionary
-   """
+   #input: the dictionary
    ### defining our M, i.e. traj with max num pts
    M = 0
    t_lengths = []
-   for t in T:
-       t_n = len(ids_from_txt.get(t))
+   for t in T.items():
+       t_n = len(t[1])
        if t_n > M:
            M = t_n
        t_lengths.append(t_n)
+       print('t_lengths: ', t_lengths) 
+   print('M: ', M)
 
    T_c = []
    for i in range(M):  # unit of time
        all_x = []
        all_y = []
-       for j in range(len(T)):
+       for j in range(len(T.values())): # for all the trajectories
+           if t_lengths[j] == 0:
+               continue
            if i / M <= i / t_lengths[j] < (i + 1) / M:
-               t = ids_from_txt.get(T[j])
-               all_x.append(t[i][0])
-               all_y.append(t[i][1])
+               all_x.append(list(T.values())[j][i][0])
+               all_y.append(list(T.values())[j][i][1])
+
        x = sum(all_x) / len(all_x)
        y = sum(all_y) / len(all_y)
        T_c.append((x, y))
@@ -221,16 +231,20 @@ def evaluate_different_k(T):
 
     # get avg costs for each value of k for random seeding
     for i in range(len(k_vals)):
+        print('k-val, random seed: {}'.format(k_vals[i]))
         k_costs = []
         for j in range(3):
+            print('run {}...'.format(j))
             _, costs = k_means_clustering(T, k_vals[i], 'random')
             k_costs.append(costs)
         avg_costs_r.append(sum(k_costs)/3)
 
     # get avg costs for each value of k for prop seeding
     for i in range(len(k_vals)):
+        print('k-val, prop seed: {}'.format(k_vals[i]))
         k_costs = []
         for j in range(3):
+            print('run {}...'.format(j))
             _, costs = k_means_clustering(T, k_vals[i], 'prop')
             k_costs.append(costs)
         avg_costs_r.append(sum(k_costs)/3)
@@ -272,12 +286,15 @@ def approach1(trajectories): #trajectories is a list of t-ids
 
 if __name__ == '__main__':
    data = import_data.import_data(fn)
-   ids = import_data.import_ids(t_ids)
+   #ids = import_data.import_ids(t_ids)
    T_complex = get_traj(data)
    T = {key: simplify.simplify_trajectory(T_complex[key], 0.3) for key in T_complex} # simplified trajectories with eps = 0.3
    n = len(list(T.keys()))
    k = 5 # TODO: update
    #seed = 'random'
+
+    ### identify bottlenecks
+   #cProfile.run('approach1(list(T.keys()))')
 
    ### experiments - evaluate different ks 
    evaluate_different_k(T)

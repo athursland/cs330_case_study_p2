@@ -32,10 +32,12 @@ def approach1(trajectories): #want trajectories as a list of trajectories so T.v
    return center
 
 def dtw(seriesA, seriesB):
-   A = seriesA
-   B = seriesB
-   n = len(seriesA)
-   m = len(seriesB)
+    A = seriesA
+    B = seriesB
+    n = len(seriesA)
+    m = len(seriesB)
+
+    """
    #base cases, fill first and if any series is 1 element
    DP = [[None for _ in range(m)] for _ in range(n)]
    DP[0][0] = dist(A[0], B[0])
@@ -50,21 +52,26 @@ def dtw(seriesA, seriesB):
            DP[i][j] = (dist(A[i], B[j]) ** 2)  + min(DP[i][j - 1], DP[i -
                                                                       1][j],
                                             DP[i - 1][j - 1])
+    """
 
-   def find_min(n, m):
-       min = (0, m)
-       for i in range(1, n):
-           if DP[i][m] < DP[min[0]][min[1]]:
-               min = (i, m)
-       return min #function to find the minimum distance b/w points
+    if n < m:
+        A,B = B,A
+        n,m = m,n
+    
+    # base cases, fill first and if any series is 1 element
+    DP = [dist(A[0], B[0])] * m
+    for j in range(1, m):
+        DP[j] = DP[j - 1] + (dist(A[0], B[j]) ** 2)
 
-   distances = []
+    for i in range(1, n):
+        prev = DP[0]
+        DP[0] = prev + (dist(A[i], B[0]) ** 2)
+        for j in range(1, m):
+            curr = DP[j]
+            DP[j] = (dist(A[i], B[j]) ** 2) + min(DP[j - 1], prev, curr)
+            prev = curr
 
-   for k in range(0, m):
-       pair = find_min(n, k)
-       distances.append(dist(A[pair[0]], B[pair[1]]))
-
-   return DP[n - 1][m - 1]
+    return DP[m - 1] ** 0.5
 
 #Distance Formula
 def dist(a, b):
