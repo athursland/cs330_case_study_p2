@@ -37,23 +37,26 @@ def dtw(seriesA, seriesB):
     n = len(seriesA)
     m = len(seriesB)
 
+    ### original attempt
+    
+    #base cases, fill first and if any series is 1 element
+    DP = [[None for _ in range(m)] for _ in range(n)]
+    DP[0][0] = dist(A[0], B[0])
+    for j in range(1, m):
+        DP[0][j] = DP[0][j - 1] + (dist(A[0], B[j]) ** 2)
+
+    for i in range(1, n):
+        DP[i][0] = DP[i - 1][0] + (dist(A[i], B[0]) ** 2)
+
+    for i in range(1, n):
+        for j in range(1, m):
+            DP[i][j] = (dist(A[i], B[j]) ** 2)  + min(DP[i][j - 1], DP[i -
+                                                                        1][j],
+                                                DP[i - 1][j - 1])
+    
+
+    ### BELOW is the attempted change 
     """
-   #base cases, fill first and if any series is 1 element
-   DP = [[None for _ in range(m)] for _ in range(n)]
-   DP[0][0] = dist(A[0], B[0])
-   for j in range(1, m):
-       DP[0][j] = DP[0][j - 1] + (dist(A[0], B[j]) ** 2)
-
-   for i in range(1, n):
-       DP[i][0] = DP[i - 1][0] + (dist(A[i], B[0]) ** 2)
-
-   for i in range(1, n):
-       for j in range(1, m):
-           DP[i][j] = (dist(A[i], B[j]) ** 2)  + min(DP[i][j - 1], DP[i -
-                                                                      1][j],
-                                            DP[i - 1][j - 1])
-    """
-
     if n < m:
         A,B = B,A
         n,m = m,n
@@ -70,8 +73,10 @@ def dtw(seriesA, seriesB):
             curr = DP[j]
             DP[j] = (dist(A[i], B[j]) ** 2) + min(DP[j - 1], prev, curr)
             prev = curr
+    """
 
-    return DP[m - 1] ** 0.5
+    #return DP[m - 1] ** 0.5 - return for attempted change 
+    return DP[n-1][m-1]
 
 #Distance Formula
 def dist(a, b):
