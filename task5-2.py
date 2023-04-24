@@ -49,7 +49,7 @@ def split_into_k_groups(lst, k):
            idx = random.randint(0, n - 1)
            n -= 1
            group.append(lst[idx])
-           lst.remove(idx)
+           lst.pop(idx)
        groups.append(group)
    return groups
 
@@ -57,7 +57,8 @@ def prop_seed(all, k):
    centers = []
    groups = split_into_k_groups(list(all.keys()), k)  # returns list of length k, with ids
    for group in groups:
-       avg = approach2(group)
+       group_dict = {key: all[key] for key in all if key in groups}
+       avg = approach2(group_dict)
        center = []
        min_dist = float('inf')
        for traj in group:
@@ -126,7 +127,7 @@ def k_means_clustering(T, k, seed):
    return [T.get(c) for c in centers], costs
 
 def approach2(T):
-   #input: the dictionary
+   #input: the ENTIRE dictionary
    ### defining our M, i.e. traj with max num pts
    M = 0
    t_lengths = []
@@ -230,6 +231,7 @@ def evaluate_different_k(T):
     avg_costs_prop = []
 
     # get avg costs for each value of k for random seeding
+    """
     for i in range(len(k_vals)):
         print('k-val, random seed: {}'.format(k_vals[i]))
         k_costs = []
@@ -243,7 +245,8 @@ def evaluate_different_k(T):
             k_costs.append(sum(j_cost)/len(j_cost)) 
             print(sum(j_cost)/len(j_cost)) ### avg for this entire run 
         print(sum(k_costs)/3) 
-        avg_costs_r.append(sum(k_costs)/3) ## avg over 3 runs 
+        avg_costs_r.append(sum(k_costs)/3) ## avg over 3 runs
+    """
 
     # get avg costs for each value of k for prop seeding
     for i in range(len(k_vals)):
@@ -251,7 +254,7 @@ def evaluate_different_k(T):
         k_costs = []
         for j in range(3):
             print('evaluate func run {}...'.format(j))
-            _, costs = k_means_clustering(T, k_vals[i], 'prop')
+            _, costs = k_means_clustering(T, k_vals[i], 'proposed')
             j_cost = []
             for k in costs:
                 j_cost.append(sum(k)/len(k)) ### avg for this iteration
@@ -260,9 +263,11 @@ def evaluate_different_k(T):
 
 
     # save results to a txt file for random seeding
+    """
     L = ["avg cost for k = {}: {}\n".format(k[i], avg_costs_r[i]) for i in range(len(k_vals))]
     with open('avg_costs_seed_random.txt', 'w') as file1:
         file1.writelines(L)
+    """
 
     # save results to a txt file for prop seeding
     L = ["avg cost for k = {}: {}\n".format(k[i], avg_costs_prop[i]) for i in range(len(k_vals))]
@@ -270,7 +275,7 @@ def evaluate_different_k(T):
         file2.writelines(L)
 
     # visualize results
-    plt.plot(k_vals, avg_costs_r, color = 'r', linewidth = 1, marker = '.', label = 'avg costs of clustering, random seeding')
+    #plt.plot(k_vals, avg_costs_r, color = 'r', linewidth = 1, marker = '.', label = 'avg costs of clustering, random seeding')
     plt.plot(k_vals, avg_costs_prop, color = 'b', linewidth = 1, marker = '.', label = 'avg costs of clustering, proposed seeding')
     plt.title('Avg cost of clustering vs. k for both seeding methods')
     plt.xlabel('k-value')
