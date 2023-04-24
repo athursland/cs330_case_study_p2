@@ -93,12 +93,10 @@ def k_means_clustering(T, k, seed):
            traj_pts = T.get(t)
            distance = float('inf')
            clusterNum = k
-           temp_sum = 0
            for ct in centers:
                ct_pts = T.get(ct)
                if dtw(traj_pts, ct_pts) < distance:  # calculate the distance between trajectory and a center trajectory
-                   distance = dtw(traj_pts, ct_pts)
-                   temp_sum += distance 
+                   distance = dtw(traj_pts, ct_pts) 
                    clusterNum = centers.index(ct)  # clusterNum is the index of which that center trajectory appears in "centers"
            temp.append(distance)
            clusters[clusterNum].append(t)
