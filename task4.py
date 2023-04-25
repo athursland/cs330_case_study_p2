@@ -8,7 +8,6 @@ import import_data
 import approach1
 import simplify
 from matplotlib import pyplot as plt
-import random
 
 ### define global variables
 fn = 'data/geolife-cars-upd8.csv'

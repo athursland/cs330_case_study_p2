@@ -7,7 +7,6 @@ noa nir
 import math
 import import_data
 from matplotlib import pyplot as plt
-import simplify
 
 fn = 'data/geolife-cars-upd8.csv'
 t_ids = 'data/trajectory-ids.txt'
@@ -18,20 +17,28 @@ global ids_from_txt
 ##### APPROACH 1
 #################
 
-def approach1(trajectories): #want trajectories as a list of trajectories so T.values()
-   min_dist = float('inf')
-   center = None
-   for t_i in trajectories:
-       total_distance = 0
-       for t_j in trajectories:
-           if t_i is not t_j:
-               total_distance += dtw(t_i, t_j)
-       if total_distance < min_dist:
-           min_dist = total_distance
-           center = t_i
-   return center
+def approach1(trajectories): 
+    """
+    input: nested list of trajectories, each list contains int tuples of (x,y) coords
+    output: center trajectory as a list of int tuples
+    """
+    min_dist = float('inf')
+    center = None
+    for t_i in trajectories:
+        total_distance = 0
+        for t_j in trajectories:
+            if t_i is not t_j:
+                total_distance += dtw(t_i, t_j)
+        if total_distance < min_dist:
+            min_dist = total_distance
+            center = t_i
+    return center
 
 def dtw(seriesA, seriesB):
+    """
+    input: two lists of int tuples seriesA and seriesB
+    output: sum of euclidian distances between seriesA and seriesB
+    """
     A = seriesA
     B = seriesB
     n = len(seriesA)
@@ -53,29 +60,7 @@ def dtw(seriesA, seriesB):
             DP[i][j] = (dist(A[i], B[j]) ** 2)  + min(DP[i][j - 1], DP[i -
                                                                         1][j],
                                                 DP[i - 1][j - 1])
-    
 
-    ### BELOW is the attempted change 
-    """
-    if n < m:
-        A,B = B,A
-        n,m = m,n
-    
-    # base cases, fill first and if any series is 1 element
-    DP = [dist(A[0], B[0])] * m
-    for j in range(1, m):
-        DP[j] = DP[j - 1] + (dist(A[0], B[j]) ** 2)
-
-    for i in range(1, n):
-        prev = DP[0]
-        DP[0] = prev + (dist(A[i], B[0]) ** 2)
-        for j in range(1, m):
-            curr = DP[j]
-            DP[j] = (dist(A[i], B[j]) ** 2) + min(DP[j - 1], prev, curr)
-            prev = curr
-    """
-
-    #return DP[m - 1] ** 0.5 - return for attempted change 
     return DP[n-1][m-1]
 
 #Distance Formula
@@ -87,6 +72,10 @@ def dist(a, b):
 #################
 
 def visualize(T, T_c):
+    """
+    input: T = list of ids of trajectories, T_c = input trajectory as list of int tuples 
+    output: visualization of chosen center trajectory vs. all other trajectories in trajectory-ids.txt 
+    """
     T_x = []
     T_y = []
 
