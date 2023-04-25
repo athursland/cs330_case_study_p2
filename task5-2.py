@@ -102,19 +102,22 @@ def prop_seed(all, k):
    """
    input: a dictionary and an integer k 
    """
-   centers = []
-   groups = split_into_k_groups(list(all.keys()), k)  # returns list of length k, with ids
-   for group in groups:
-       group_dict = {key: all[key] for key in all if key in group}
-       avg = approach2(group_dict) ### returns the avg trajectory
-       center = []
-       min_dist = float('inf')
-       for traj in group:
-           dist = dtw(all.get(traj), avg)
-           if dist < min_dist:
-               min_dist = dist
-               center = traj
-       centers.append(center)
+   center_ids = [random.choice(list(all.keys()))]
+   while len(center_ids) < k:
+       max_distance = 0
+       new_center_id = None
+       for traj_id in all.keys():
+           if traj_id not in center_ids:
+               distance = 0
+               for c_id in center_ids:
+                   traj1 = all[traj_id]
+                   traj2 = all[c_id]
+                   distance += dtw(traj1, traj2)
+               if distance > max_distance:
+                   max_distance = distance
+                   new_center_id = traj_id
+       center_ids.append(new_center_id)
+   centers = [traj_id for traj_id in center_ids]
    return centers
 
 def hierarchal_seed(all, k):
@@ -398,7 +401,7 @@ if __name__ == '__main__':
    T_complex = get_traj(data)
    T = {key: simplify.simplify_trajectory(T_complex[key], 0.3) for key in T_complex} # simplified trajectories with eps = 0.3
    n = len(list(T.keys()))
-   k = 10 # TODO: update
+   k = 8 # TODO: update
    #seed = 'random'
 
     ### identify bottlenecks
@@ -408,13 +411,13 @@ if __name__ == '__main__':
    #evaluate_different_k(T)
 
    ######## plot the centers for our proposed k and proposed seeding
-   random_centers, random_costs = k_means_clustering(T, k, 'random')
-   prop_centers, prop_costs = k_means_clustering(T, k, 'proposed')
-   #plot_centers(T, random_centers)
+   #random_centers, random_costs = k_means_clustering(T, k, 'random')
+   #prop_centers, prop_costs = k_means_clustering(T, k, 'proposed')
+   #plot_centers(T, prop_centers)
 
    ######## evaluate averages
-   random_avgs = average_costs(random_costs, len(random_costs))
-   prop_avgs = average_costs(prop_costs, len(prop_costs))
-   visualize_avg_costs(random_avgs, prop_avgs)
+   #random_avgs = average_costs(random_costs, len(random_costs))
+   #prop_avgs = average_costs(prop_costs, len(prop_costs))
+   #visualize_avg_costs(random_avgs, prop_avgs)
 
    

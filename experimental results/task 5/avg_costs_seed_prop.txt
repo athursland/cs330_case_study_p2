@@ -1,0 +1,5 @@
+avg cost for k = 4: 106.0141799461385
+avg cost for k = 6: 334.39609120426366
+avg cost for k = 8: 27.761376103458787
+avg cost for k = 10: 261.1227606656735
+avg cost for k = 12: 251.79470368293607
