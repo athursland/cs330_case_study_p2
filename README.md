@@ -40,6 +40,11 @@ The ZIP file also contains the following .png files, in the figures folder:
  - avg_costs_vs_k.png: Average costs of clustering for random and proposed seeding methods vs. k = [4,6,8,10,12]
  - centers_prop_seed_k_10.png: Centers of clusters chosen using our proposed seeding method for our chosen k, k = 10.
  - avg_costs_over_iterations.png: Average cost of clustering for over iterations for both random and proposed seeding methods
+ 
+ ### data
+ This folder contains two files: 
+ - geolife-cars-upd8.csv: trajectory data given in problem 
+ - trajectory-ids.txt: text file containing ids of 11 trajectories for implementing/testing Approach 1 and Approach 2
 
 To reproduce our experimental results for each task, run approach1.py, task4.py and task5.py.
 
