@@ -8,7 +8,6 @@ mike kim
 import time 
 import random
 from approach1 import dtw
-from approach1 import dist
 import import_data
 import csv
 import simplify
@@ -269,9 +268,10 @@ def visualize_avg_costs(random_avgs, prop_avgs):
     using average_costs function, plot the avg cost of clustering 
     over iterations for both seeding methods using suggested value of k
     """
-    iter = [j for j in range(len(random_avgs))] # arbitrary
-    plt.plot(iter, random_avgs, color = 'r', linewidth = 0.8, marker = '.', label = 'random seeding method')
-    plt.plot(iter, prop_avgs, color = 'b', linewidth = 0.8, marker = '.', label = 'proposed seeding method')
+    iter_r = [j for j in range(len(random_avgs))]
+    iter_p = [j for j in range(len(prop_avgs))]
+    plt.plot(iter_r, random_avgs, color = 'r', linewidth = 0.8, marker = '.', label = 'random seeding method')
+    plt.plot(iter_p, prop_avgs, color = 'b', linewidth = 0.8, marker = '.', label = 'proposed seeding method')
     plt.title('Avg cost of clustering over iterations for random vs. proposed seeding methods')
     plt.xlabel('iteration')
     plt.ylabel('average cost of clustering')
@@ -401,23 +401,19 @@ if __name__ == '__main__':
    T_complex = get_traj(data)
    T = {key: simplify.simplify_trajectory(T_complex[key], 0.3) for key in T_complex} # simplified trajectories with eps = 0.3
    n = len(list(T.keys()))
-   k = 8 # TODO: update
-   #seed = 'random'
+   k = 8 
 
-    ### identify bottlenecks
-   #cProfile.run('approach1(list(T.keys()))')
-
-   ### experiments - evaluate different ks 
+   ######## experiments - evaluate different ks 
    #evaluate_different_k(T)
 
-   ######## plot the centers for our proposed k and proposed seeding
-   #random_centers, random_costs = k_means_clustering(T, k, 'random')
-   #prop_centers, prop_costs = k_means_clustering(T, k, 'proposed')
+   ######## experiments - plot the centers for our proposed k and proposed seeding
+   random_centers, random_costs = k_means_clustering(T, k, 'random')
+   prop_centers, prop_costs = k_means_clustering(T, k, 'proposed')
    #plot_centers(T, prop_centers)
 
-   ######## evaluate averages
-   #random_avgs = average_costs(random_costs, len(random_costs))
-   #prop_avgs = average_costs(prop_costs, len(prop_costs))
-   #visualize_avg_costs(random_avgs, prop_avgs)
+   ######## experiments - evaluate averages
+   random_avgs = average_costs(random_costs, len(random_costs))
+   prop_avgs = average_costs(prop_costs, len(prop_costs))
+   visualize_avg_costs(random_avgs, prop_avgs)
 
    
